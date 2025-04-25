@@ -9,9 +9,9 @@ import os
 
 teletips=Client(
     "MediaToTelegraphLink",
-    api_id = int(os.environ["API_ID"]),
-    api_hash = os.environ["API_HASH"],
-    bot_token = os.environ["BOT_TOKEN"]
+    api_id = int(os.environ["23418117"]),
+    api_hash = os.environ["e93479e4b3eae090bf90a978b14ffc09"],
+    bot_token = os.environ["7637171557:AAH2xUoi7MO-zfNDeXI3d7Q8S6pJdC3gFkY"]
 )
 
 @teletips.on_message(filters.command('start') & filters.private)
@@ -25,7 +25,7 @@ Valid file types are 'jpeg', 'jpg', 'png', 'mp4' and 'gif'.
 
 To generate links in **group chats**, add me to your supergroup and send the command <code>/tl</code> as a reply to a valid media file.
 
-🏠 | [Home](https://t.me/teletipsofficialchannel)
+🏠 | [Home](https://t.me/FN7DANGER)
             """
     await teletips.send_message(message.chat.id, text, disable_web_page_preview=True)
     
