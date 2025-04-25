@@ -3,6 +3,7 @@ from pyrogram.types import Message
 from telegraph import upload_file
 import os
 
+# Initialize the bot client
 teletips = Client(
     "MediaToTelegraphLink",
     api_id=int(os.environ["API_ID"]),
@@ -10,6 +11,7 @@ teletips = Client(
     bot_token=os.environ["BOT_TOKEN"]
 )
 
+# Start command handler
 @teletips.on_message(filters.command('start') & filters.private)
 async def start(client, message):
     text = f"""
@@ -25,23 +27,25 @@ To generate links in **group chats**, add me to your supergroup and send the com
             """
     await teletips.send_message(message.chat.id, text, disable_web_page_preview=True)
 
-
+# Private media link generation handler
 @teletips.on_message(filters.media & filters.private)
 async def get_link_private(client, message):
     try:
         text = await message.reply("Processing...")
+        
         async def progress(current, total):
             await text.edit_text(f"📥 Downloading media... {current * 100 / total:.1f}%")
+        
         try:
             location = f"./media/private/"
             local_path = await message.download(location, progress=progress)
             await text.edit_text("📤 Uploading to Telegraph...")
             upload_path = upload_file(local_path)
 
-            # Debugging: Log the upload_file return value
+            # Debugging: Log the return value of upload_file
             print(f"DEBUG: upload_file returned: {upload_path} (Type: {type(upload_path)})")
 
-            # Handle the return value properly
+            # Validate and handle the upload_file return value
             if isinstance(upload_path, list) and len(upload_path) > 0:
                 link = upload_path[0]
             elif isinstance(upload_path, str):
@@ -51,31 +55,35 @@ async def get_link_private(client, message):
 
             await text.edit_text(f"**🌐 | Telegraph Link**:\n\n<code>https://telegra.ph{link}</code>")
             os.remove(local_path)
+
         except Exception as e:
             await text.edit_text(f"**❌ | File upload failed**\n\n<i>**Reason**: {e}</i>")
             if os.path.exists(local_path):
                 os.remove(local_path)
             return
+
     except Exception as e:
         await message.reply(f"An unexpected error occurred: {e}")
 
-
+# Group media link generation handler
 @teletips.on_message(filters.command('tl'))
 async def get_link_group(client, message):
     try:
         text = await message.reply("Processing...")
+
         async def progress(current, total):
             await text.edit_text(f"📥 Downloading media... {current * 100 / total:.1f}%")
+        
         try:
             location = f"./media/group/"
             local_path = await message.reply_to_message.download(location, progress=progress)
             await text.edit_text("📤 Uploading to Telegraph...")
             upload_path = upload_file(local_path)
 
-            # Debugging: Log the upload_file return value
+            # Debugging: Log the return value of upload_file
             print(f"DEBUG: upload_file returned: {upload_path} (Type: {type(upload_path)})")
 
-            # Handle the return value properly
+            # Validate and handle the upload_file return value
             if isinstance(upload_path, list) and len(upload_path) > 0:
                 link = upload_path[0]
             elif isinstance(upload_path, str):
@@ -85,14 +93,18 @@ async def get_link_group(client, message):
 
             await text.edit_text(f"**🌐 | Telegraph Link**:\n\n<code>https://telegra.ph{link}</code>")
             os.remove(local_path)
+
         except Exception as e:
             await text.edit_text(f"**❌ | File upload failed**\n\n<i>**Reason**: {e}</i>")
             if os.path.exists(local_path):
                 os.remove(local_path)
             return
+
     except Exception as e:
         await message.reply(f"An unexpected error occurred: {e}")
 
+# Log that the bot is running
 print("Bot is alive!")
 
+# Run the bot
 teletips.run()
