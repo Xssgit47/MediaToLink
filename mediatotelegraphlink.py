@@ -47,7 +47,7 @@ To generate links in group chats, add me to your supergroup and send the command
 
 @teletips.on_message(filters.media & filters.private)
 async def get_link_private(client, message):
-    try:
+    try:  # ADDED try
         text = await message.reply("Processing...")
 
         async def progress(current, total):
@@ -58,21 +58,22 @@ async def get_link_private(client, message):
         await text.edit_text("📤 Uploading to Telegraph...")
         try:
             upload_path = upload_file(local_path)
-            print(f"Debug: upload_path = {upload_path}") # ADDED DEBUG LINE
-
-            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}") #THIS LINE IS ALMOST CERTAINLY INCORRECT
+            print(f"Debug: upload_path = {upload_path}")  # Debug line
+            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")  # THIS LINE IS LIKELY INCORRECT
             os.remove(local_path)
         except Exception as e:
             await text.edit_text(f"❌ | File upload failed\n\nReason: {e}")
-            os.remove(local_path)
+            if os.path.exists(local_path): #Check if the file exists before attempting to remove
+               os.remove(local_path)
             return
-    except Exception as e:
-        await message.reply(f"An error occurred: {e}")
+    except Exception as e:  # ADDED EXCEPT
+        print(f"get_link_private error: {e}")  # ADDED PRINT STATEMENT
+        await message.reply(f"An error occurred: {e}")  # Send error message to Telegram
 
 
 @teletips.on_message(filters.command('tl'))
 async def get_link_group(client, message):
-    try:
+    try:  # ADDED TRY
         text = await message.reply("Processing...")
 
         async def progress(current, total):
@@ -83,16 +84,17 @@ async def get_link_group(client, message):
         await text.edit_text("📤 Uploading to Telegraph...")
         try:
             upload_path = upload_file(local_path)
-            print(f"Debug: upload_path = {upload_path}")  # ADDED DEBUG LINE
-
-            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}") #THIS LINE IS ALMOST CERTAINLY INCORRECT
+            print(f"Debug: upload_path = {upload_path}")  # Debug line
+            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")  # THIS LINE IS LIKELY INCORRECT
             os.remove(local_path)
         except Exception as e:
             await text.edit_text(f"❌ | File upload failed\n\nReason: {e}")
-            os.remove(local_path)
+            if os.path.exists(local_path): #Check if the file exists before attempting to remove
+                os.remove(local_path)
             return
-    except Exception as e:
-        await message.reply(f"An error occurred: {e}")
+    except Exception as e:  # ADDED EXCEPT
+        print(f"get_link_group error: {e}")  # ADDED PRINT
+        await message.reply(f"An error occurred: {e}")  # Send error message to Telegram
 
 
 print("Bot is alive!")
