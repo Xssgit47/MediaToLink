@@ -59,7 +59,7 @@ async def get_link_private(client, message):
         try:
             upload_path = upload_file(local_path)
             #The correction is in the next line:
-            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path}")
+            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")
             os.remove(local_path)
         except Exception as e:
             await text.edit_text(f"❌ | File upload failed\n\nReason: {e}")
@@ -83,7 +83,7 @@ async def get_link_group(client, message):
         try:
             upload_path = upload_file(local_path)
             #The correction is in the next line:
-            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path}")
+            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")
             os.remove(local_path)
         except Exception as e:
             await text.edit_text(f"❌ | File upload failed\n\nReason: {e}")
