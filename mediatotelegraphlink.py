@@ -1,7 +1,3 @@
-# Copyright ©️ 2022 TeLe TiPs. All Rights Reserved
-# You are free to use this code in any of your project, but you MUST include the following in your README.md (Copy & paste)
-# ##Credits - [MediaToTelegraphLink bot by TeLe TiPs] (https://github.com/teletips/MediaToTelegraphLink-TeLeTiPs)
-
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from telegraph import upload_file
@@ -29,6 +25,7 @@ To generate links in **group chats**, add me to your supergroup and send the com
             """
     await teletips.send_message(message.chat.id, text, disable_web_page_preview=True)
 
+
 @teletips.on_message(filters.media & filters.private)
 async def get_link_private(client, message):
     try:
@@ -40,22 +37,28 @@ async def get_link_private(client, message):
             local_path = await message.download(location, progress=progress)
             await text.edit_text("📤 Uploading to Telegraph...")
             upload_path = upload_file(local_path)
-            
+
+            # Debugging: Log the upload_file return value
+            print(f"DEBUG: upload_file returned: {upload_path} (Type: {type(upload_path)})")
+
             # Handle the return value properly
             if isinstance(upload_path, list) and len(upload_path) > 0:
                 link = upload_path[0]
+            elif isinstance(upload_path, str):
+                link = upload_path
             else:
-                link = upload_path  # Use the string directly if not a list
+                raise ValueError(f"Unexpected return type from upload_file: {type(upload_path)}")
 
-            await text.edit_text(f"**🌐 | Telegraph Link**:\n\n<code>https://telegra.ph{link}</code>")     
+            await text.edit_text(f"**🌐 | Telegraph Link**:\n\n<code>https://telegra.ph{link}</code>")
             os.remove(local_path)
         except Exception as e:
             await text.edit_text(f"**❌ | File upload failed**\n\n<i>**Reason**: {e}</i>")
             if os.path.exists(local_path):
                 os.remove(local_path)
-            return                 
+            return
     except Exception as e:
         await message.reply(f"An unexpected error occurred: {e}")
+
 
 @teletips.on_message(filters.command('tl'))
 async def get_link_group(client, message):
@@ -69,19 +72,24 @@ async def get_link_group(client, message):
             await text.edit_text("📤 Uploading to Telegraph...")
             upload_path = upload_file(local_path)
 
+            # Debugging: Log the upload_file return value
+            print(f"DEBUG: upload_file returned: {upload_path} (Type: {type(upload_path)})")
+
             # Handle the return value properly
             if isinstance(upload_path, list) and len(upload_path) > 0:
                 link = upload_path[0]
+            elif isinstance(upload_path, str):
+                link = upload_path
             else:
-                link = upload_path  # Use the string directly if not a list
+                raise ValueError(f"Unexpected return type from upload_file: {type(upload_path)}")
 
-            await text.edit_text(f"**🌐 | Telegraph Link**:\n\n<code>https://telegra.ph{link}</code>")     
+            await text.edit_text(f"**🌐 | Telegraph Link**:\n\n<code>https://telegra.ph{link}</code>")
             os.remove(local_path)
         except Exception as e:
             await text.edit_text(f"**❌ | File upload failed**\n\n<i>**Reason**: {e}</i>")
             if os.path.exists(local_path):
                 os.remove(local_path)
-            return         
+            return
     except Exception as e:
         await message.reply(f"An unexpected error occurred: {e}")
 
