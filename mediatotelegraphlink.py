@@ -57,18 +57,20 @@ async def get_link_private(client, message):
         local_path = await message.download(location, progress=progress)
         await text.edit_text("📤 Uploading to Telegraph...")
         try:
-            upload_path = upload_file(local_path)
-            print(f"Debug: upload_path = {upload_path}")  # Debug line
-            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")  # THIS LINE IS LIKELY INCORRECT
-            os.remove(local_path)
-        except Exception as e:
-            await text.edit_text(f"❌ | File upload failed\n\nReason: {e}")
-            if os.path.exists(local_path): #Check if the file exists before attempting to remove
-               os.remove(local_path)
-            return
-    except Exception as e:  # ADDED EXCEPT
-        print(f"get_link_private error: {e}")  # ADDED PRINT STATEMENT
-        await message.reply(f"An error occurred: {e}")  # Send error message to Telegram
+            try: # wrap the call to upload_file with try/except
+                upload_path = upload_file(local_path)
+                print(f"Debug: upload_path = {upload_path}")  # Debug line
+                await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")  # THIS LINE IS LIKELY INCORRECT
+                os.remove(local_path)
+            except Exception as upload_error: #Catch errors related to upload_file
+                print(f"upload_file error: {upload_error}")
+                await text.edit_text(f"❌ | File upload to Telegraph failed.\n\nReason: {upload_error}")
+                if os.path.exists(local_path): #Check if the file exists before attempting to remove
+                                    os.remove(local_path)
+
+        except Exception as e:  # ADDED EXCEPT
+            print(f"get_link_private error: {e}")  # ADDED PRINT STATEMENT
+            await message.reply(f"An error occurred: {e}")  # Send error message to Telegram
 
 
 @teletips.on_message(filters.command('tl'))
@@ -83,18 +85,20 @@ async def get_link_group(client, message):
         local_path = await message.reply_to_message.download(location, progress=progress)
         await text.edit_text("📤 Uploading to Telegraph...")
         try:
-            upload_path = upload_file(local_path)
-            print(f"Debug: upload_path = {upload_path}")  # Debug line
-            await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")  # THIS LINE IS LIKELY INCORRECT
-            os.remove(local_path)
-        except Exception as e:
-            await text.edit_text(f"❌ | File upload failed\n\nReason: {e}")
-            if os.path.exists(local_path): #Check if the file exists before attempting to remove
+            try: # wrap the call to upload_file with try/except
+                upload_path = upload_file(local_path)
+                print(f"Debug: upload_path = {upload_path}")  # Debug line
+                await text.edit_text(f"🌐 | Telegraph Link:\n\nhttps://telegra.ph{upload_path[0]['src']}")  # THIS LINE IS LIKELY INCORRECT
                 os.remove(local_path)
-            return
-    except Exception as e:  # ADDED EXCEPT
-        print(f"get_link_group error: {e}")  # ADDED PRINT
-        await message.reply(f"An error occurred: {e}")  # Send error message to Telegram
+            except Exception as upload_error: #Catch errors related to upload_file
+                print(f"upload_file error: {upload_error}")
+                await text.edit_text(f"❌ | File upload to Telegraph failed.\n\nReason: {upload_error}")
+                if os.path.exists(local_path): #Check if the file exists before attempting to remove
+                    os.remove(local_path)
+
+        except Exception as e:  # ADDED EXCEPT
+            print(f"get_link_group error: {e}")  # ADDED PRINT
+            await message.reply(f"An error occurred: {e}")  # Send error message to Telegram
 
 
 print("Bot is alive!")
